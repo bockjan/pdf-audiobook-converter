@@ -17,6 +17,12 @@
         .upload-area:hover {
             transform: translateY(-2px);
         }
+        .audio-player::-webkit-media-controls-panel {
+            background-color: #1f2937;
+        }
+        .audio-player::-webkit-slider-thumb {
+            background-color: #3b82f6;
+        }
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -63,6 +69,26 @@
                         </label>
                     </div>
 
+                    <!-- Selected File Info -->
+                    <div id="fileInfo" class="hidden">
+                        <div class="bg-gray-700/50 rounded-lg p-4 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <div>
+                                    <p id="fileName" class="text-sm font-medium text-gray-200"></p>
+                                    <p id="fileSize" class="text-xs text-gray-400"></p>
+                                </div>
+                            </div>
+                            <button type="button" id="removeFile" class="text-gray-400 hover:text-gray-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Convert Button -->
                     <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                         Convert to Audiobook
@@ -80,46 +106,76 @@
                             <div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                         </div>
                     </div>
-
-                    <!-- Download Section -->
-                    <div id="downloadSection" class="hidden">
-                        <button id="downloadButton" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 animate-pulse-slow">
-                            Download Audiobook
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Features Section -->
-            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                    <div class="text-blue-400 mb-3">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2">Fast Processing</h3>
-                    <p class="text-gray-400">Quick conversion with real-time progress tracking</p>
-                </div>
-                
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                    <div class="text-purple-400 mb-3">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold mb-2">Natural Voice</h3>
-                    <p class="text-gray-400">High-quality text-to-speech conversion</p>
                 </div>
 
-                <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                    <div class="text-emerald-400 mb-3">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                        </svg>
+                <!-- Audio Player Section -->
+                <div id="audioPlayerSection" class="hidden mt-8 space-y-4">
+                    <div class="bg-gray-700/50 rounded-lg p-4">
+                        <!-- Custom Audio Controls -->
+                        <div class="space-y-4">
+                            <!-- Time and Progress -->
+                            <div class="flex items-center space-x-4">
+                                <span id="currentTime" class="text-sm text-gray-300">0:00</span>
+                                <div class="flex-1">
+                                    <input type="range" id="seekBar" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" value="0">
+                                </div>
+                                <span id="duration" class="text-sm text-gray-300">0:00</span>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <!-- Speed Control -->
+                                    <select id="playbackSpeed" class="bg-gray-600 text-white rounded px-2 py-1 text-sm">
+                                        <option value="0.75">0.75x</option>
+                                        <option value="1" selected>1x</option>
+                                        <option value="1.25">1.25x</option>
+                                        <option value="1.5">1.5x</option>
+                                        <option value="2">2x</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center space-x-6">
+                                    <!-- Backward 15s -->
+                                    <button id="backward15" class="text-gray-300 hover:text-white">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Play/Pause -->
+                                    <button id="playPause" class="bg-blue-500 hover:bg-blue-600 rounded-full p-3">
+                                        <svg id="playIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                        </svg>
+                                        <svg id="pauseIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Forward 15s -->
+                                    <button id="forward15" class="text-gray-300 hover:text-white">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Volume Control -->
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 8v8m3.536-11.536a8 8 0 010 14.142M9.364 9.364L5.657 5.657m0 12.728l3.707-3.707"/>
+                                    </svg>
+                                    <input type="range" id="volume" class="w-20 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer" min="0" max="1" step="0.1" value="1">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden Native Audio Element -->
+                        <audio id="audioElement" class="hidden">
+                            Your browser does not support the audio element.
+                        </audio>
                     </div>
-                    <h3 class="text-lg font-semibold mb-2">Customizable</h3>
-                    <p class="text-gray-400">Support for multiple file formats</p>
                 </div>
             </div>
         </div>
@@ -127,7 +183,40 @@
 
     <script>
         let currentJobId = null;
+        let audioElement = document.getElementById('audioElement');
+        
+        // File Input Handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                showFileInfo(file);
+            }
+        });
 
+        function showFileInfo(file) {
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        document.getElementById('removeFile').addEventListener('click', function() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+        });
+
+        // Form Submission
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -152,6 +241,7 @@
             }
         });
 
+        // Status Polling
         async function pollJobStatus() {
             if (!currentJobId) return;
 
@@ -164,7 +254,9 @@
                 document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
 
                 if (status.status === 'completed') {
-                    document.getElementById('downloadSection').classList.remove('hidden');
+                    document.getElementById('progressSection').classList.add('hidden');
+                    document.getElementById('audioPlayerSection').classList.remove('hidden');
+                    setupAudioPlayer(currentJobId);
                 } else if (status.status === 'failed') {
                     alert('Conversion failed: ' + status.error);
                 } else {
@@ -175,53 +267,150 @@
             }
         }
 
-        document.getElementById('downloadButton')?.addEventListener('click', async () => {
-            if (!currentJobId) return;
-            
-            try {
-                window.location.href = `/download/${currentJobId}`;
-            } catch (error) {
-                alert('Error downloading file: ' + error.message);
-            }
-        });
+        // Audio Player Setup
+        function setupAudioPlayer(jobId) {
+            audioElement.src = `/download/${jobId}`;
+            initializeAudioControls();
+        }
 
-        // File drag and drop handling
-        const dropZone = document.querySelector('.upload-area');
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
+// Continue after setupAudioPlayer function...
 
-        function preventDefaults (e) {
+function initializeAudioControls() {
+    const playPauseBtn = document.getElementById('playPause');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const seekBar = document.getElementById('seekBar');
+    const volumeControl = document.getElementById('volume');
+    const speedControl = document.getElementById('playbackSpeed');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const durationDisplay = document.getElementById('duration');
+    const forward15 = document.getElementById('forward15');
+    const backward15 = document.getElementById('backward15');
+
+    // Play/Pause
+    playPauseBtn.addEventListener('click', () => {
+        if (audioElement.paused) {
+            audioElement.play();
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+        } else {
+            audioElement.pause();
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        }
+    });
+
+    // Update seek bar as audio plays
+    audioElement.addEventListener('timeupdate', () => {
+        const progress = (audioElement.currentTime / audioElement.duration) * 100;
+        seekBar.value = progress;
+        currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
+    });
+
+    // Seek bar control
+    seekBar.addEventListener('change', () => {
+        const time = (seekBar.value * audioElement.duration) / 100;
+        audioElement.currentTime = time;
+    });
+
+    // Volume control
+    volumeControl.addEventListener('input', () => {
+        audioElement.volume = volumeControl.value;
+    });
+
+    // Playback speed
+    speedControl.addEventListener('change', () => {
+        audioElement.playbackRate = speedControl.value;
+    });
+
+    // Forward 15 seconds
+    forward15.addEventListener('click', () => {
+        audioElement.currentTime = Math.min(
+            audioElement.currentTime + 15,
+            audioElement.duration
+        );
+    });
+
+    // Backward 15 seconds
+    backward15.addEventListener('click', () => {
+        audioElement.currentTime = Math.max(audioElement.currentTime - 15, 0);
+    });
+
+    // Update duration display when metadata is loaded
+    audioElement.addEventListener('loadedmetadata', () => {
+        seekBar.max = 100;
+        durationDisplay.textContent = formatTime(audioElement.duration);
+    });
+
+    // Reset UI when audio ends
+    audioElement.addEventListener('ended', () => {
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+        seekBar.value = 0;
+        currentTimeDisplay.textContent = '0:00';
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Space bar for play/pause
+        if (e.code === 'Space') {
             e.preventDefault();
-            e.stopPropagation();
+            playPauseBtn.click();
         }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight(e) {
-            dropZone.querySelector('.border-dashed').classList.add('border-blue-500');
-            dropZone.querySelector('.border-dashed').classList.add('bg-gray-700/30');
+        // Left arrow for rewind
+        if (e.code === 'ArrowLeft') {
+            backward15.click();
         }
-
-        function unhighlight(e) {
-            dropZone.querySelector('.border-dashed').classList.remove('border-blue-500');
-            dropZone.querySelector('.border-dashed').classList.remove('bg-gray-700/30');
+        // Right arrow for forward
+        if (e.code === 'ArrowRight') {
+            forward15.click();
         }
+    });
+}
 
-        dropZone.addEventListener('drop', handleDrop, false);
+// Helper function to format time in MM:SS
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
 
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            document.getElementById('fileInput').files = files;
-        }
-    </script>
-</body>
-</html>
+// Add error handling for audio
+audioElement.addEventListener('error', () => {
+    alert('Error loading audio file. Please try again.');
+});
+
+// Add loading state
+audioElement.addEventListener('waiting', () => {
+    // Show loading indicator if needed
+    playPauseBtn.classList.add('opacity-50');
+});
+
+audioElement.addEventListener('canplay', () => {
+    // Hide loading indicator
+    playPauseBtn.classList.remove('opacity-50');
+});
+
+// Volume persistence
+if (localStorage.getItem('audioVolume')) {
+    const savedVolume = localStorage.getItem('audioVolume');
+    audioElement.volume = savedVolume;
+    volumeControl.value = savedVolume;
+}
+
+volumeControl.addEventListener('change', () => {
+    localStorage.setItem('audioVolume', volumeControl.value);
+});
+
+// Playback rate persistence
+if (localStorage.getItem('playbackRate')) {
+    const savedRate = localStorage.getItem('playbackRate');
+    audioElement.playbackRate = savedRate;
+    speedControl.value = savedRate;
+}
+
+speedControl.addEventListener('change', () => {
+    localStorage.setItem('playbackRate', speedControl.value);
+});
+
+</script>
